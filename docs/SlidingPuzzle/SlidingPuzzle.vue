@@ -258,21 +258,25 @@ function handleInput(ev: KeyboardEvent) {
     movePlayerTo(
       findWallInDirection(playerPosition.value, { x: 0, y: -1 }, board.value)
     );
+    ev.preventDefault();
   } else if (ev.code == "ArrowDown") {
     console.log("down");
     movePlayerTo(
       findWallInDirection(playerPosition.value, { x: 0, y: 1 }, board.value)
     );
+    ev.preventDefault();
   } else if (ev.code == "ArrowLeft") {
     console.log("left");
     movePlayerTo(
       findWallInDirection(playerPosition.value, { x: -1, y: 0 }, board.value)
     );
+    ev.preventDefault();
   } else if (ev.code == "ArrowRight") {
     console.log("right");
     movePlayerTo(
       findWallInDirection(playerPosition.value, { x: 1, y: 0 }, board.value)
     );
+    ev.preventDefault();
   }
 }
 </script>
