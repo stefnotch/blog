@@ -1,5 +1,5 @@
 module.exports = {
-  base: "/web/Blog/",
+  base: "/Blog/",
   head: [],
   title: "Stefnotch's Bloggy Blog",
   themeConfig: {
