@@ -5,7 +5,7 @@ Then, unsurprisingly, we take a position out of the queue. We do this whole 'wal
 
 In the worst case, we visit every single tile once, before having marked everything as completed. So $O(n \cdot m)$, which is nice and polynomial!
 
-Verifying that this will find every solution is left as an exercise for the reader. The author appreciates any and all proper proofs or decent explanations sent their way.
+Verifying that this will always find a solution if one exists is left as an exercise for the reader. The author appreciates any and all proper proofs or decent explanations sent their way.
 
 Click on the board to start playing.
 
