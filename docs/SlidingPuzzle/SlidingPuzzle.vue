@@ -25,7 +25,6 @@ initializeBoard(board.value);
 watch(
   boardSize,
   (newSize) => {
-    console.log("new size", newSize);
     board.value = createBoard(newSize);
     player.placeOnBoard(board.value);
     initializeBoard(board.value);
