@@ -10,7 +10,7 @@ Verifying that this will always find a solution if one exists is left as an exer
 Click on the board to start playing.
 
 <ClientOnly>
-  <SlidingPuzzle/>
+<SlidingPuzzle/>
 </ClientOnly>
 
 <script setup>

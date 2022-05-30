@@ -12,9 +12,10 @@
     "resolveJsonModule": true,
     "baseUrl": ".",
     "isolatedModules": true,
+    "jsx": "preserve",
     "lib": ["esnext", "dom", "dom.iterable"],
     "outDir": "./dist"
   },
-  "include": ["src/**/*.ts", "src/**/*.js", "src/**/*.vue"],
+  "include": ["docs/**/*.ts", "docs/**/*.js", "docs/**/*.vue"],
   "exclude": ["node_modules"]
 }
