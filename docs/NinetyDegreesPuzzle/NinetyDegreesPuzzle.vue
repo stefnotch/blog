@@ -27,21 +27,17 @@ const boardSize = ref({
 });
 const board = ref(createBoardWithSize(boardSize.value));
 
-function displayCell(cell: Cell<typeof Cells>): string {
+function displayCellStyle(cell: Cell<typeof Cells>): string {
   if (cell === Cells.Empty) {
-    return " ";
+    return "display: none";
   } else if (cell === Cells.TopLeft) {
-    ("◞");
-    return "◰";
+    return "left: -50%; top: -50%;  clip-path: polygon(50% 50%, 100% 50%, 100% 100%, 50% 100%);";
   } else if (cell === Cells.LeftBottom) {
-    ("◝");
-    return "◱";
+    return "left: -50%; top: 50%;  clip-path: polygon(50% 0, 100% 0, 100% 50%, 50% 50%);";
   } else if (cell === Cells.BottomRight) {
-    ("◜");
-    return "◲";
+    return "left: 50%; top: 50%; clip-path: polygon(0 0, 50% 0, 50% 50%, 0 50%);";
   } else if (cell === Cells.RightTop) {
-    ("◟");
-    return "◳";
+    return "left: 50%; top: -50%; clip-path: polygon(0 50%, 50% 50%, 50% 100%, 0 100%);";
   }
   return "?";
 }
@@ -88,7 +84,7 @@ function cycleCell(cell: Cell<typeof Cells>): Cell<typeof Cells> {
     <tbody>
       <tr v-for="(row, y) in board.cells">
         <td v-for="(cell, x) in row" @click="(ev) => handleClick(ev, y, x)">
-          <div class="game-table-cell">{{ displayCell(cell) }}</div>
+          <div class="game-table-cell" :style="displayCellStyle(cell)"></div>
         </td>
       </tr>
     </tbody>
@@ -110,14 +106,26 @@ function cycleCell(cell: Cell<typeof Cells>): Cell<typeof Cells> {
   position: relative;
   user-select: none;
   line-height: 0px;
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 2rem;
+  height: 2rem;
   padding: 0px;
   margin: 0px;
 }
 .game-table-cell {
+  --line-thickness: 4px;
   position: absolute;
-  font-size: 1.8em;
+  top: 0;
+  left: 0;
+  width: calc(100% + var(--line-thickness));
+  height: calc(100% + var(--line-thickness));
+  border: var(--line-thickness) solid #000;
+  transform: translate(
+    calc(-1 * var(--line-thickness) / 2),
+    calc(-1 * var(--line-thickness) / 2)
+  );
+  border-radius: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 .game-table td:hover {
   cursor: pointer;
