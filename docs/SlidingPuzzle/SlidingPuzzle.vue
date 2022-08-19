@@ -1,21 +1,15 @@
 <script setup lang="ts">
 import { ref, computed, watch, type Ref, type ComputedRef } from "vue";
 import { Position } from "./position";
-import {
-  type Cell,
-  Cells,
-  createBoard,
-  Board,
-  copyBoard,
-  copyBoardTo,
-} from "./sliding-puzzle-board";
+import { Cells, createBoardWithSize, Board } from "./sliding-puzzle-board";
+import { Cell, copyBoard, copyBoardTo, createBoard } from "../Puzzles/board";
 import { usePlayer } from "./sliding-puzzle-player";
 
 const boardSize = ref({
   width: 10,
   height: 10,
 });
-const board = ref(createBoard(boardSize.value));
+const board = ref(createBoardWithSize(boardSize.value));
 const player = usePlayer();
 
 const solution = ref<Position[]>([]);
@@ -25,7 +19,7 @@ initializeBoard(board.value);
 watch(
   boardSize,
   (newSize) => {
-    board.value = createBoard(newSize);
+    board.value = createBoardWithSize(newSize);
     player.placeOnBoard(board.value);
     initializeBoard(board.value);
   },
@@ -180,7 +174,7 @@ function findWallInDirection(
     start = next;
   }
 }
-function displayCell(cell: Cell): string {
+function displayCell(cell: Cell<typeof Cells>): string {
   if (cell === Cells.Empty) {
     return " ";
   } else if (cell === Cells.Stone) {
