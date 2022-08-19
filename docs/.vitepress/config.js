@@ -1,4 +1,6 @@
-module.exports = {
+import mk from "@traptitech/markdown-it-katex";
+
+export default {
   base: "/Blog/",
   head: [],
   title: "Stefnotch's Bloggy Blog",
@@ -20,8 +22,6 @@ module.exports = {
 
     config: (md) => {
       // use more markdown-it plugins!
-      mk = require("@traptitech/markdown-it-katex");
-
       md.use(mk, { throwOnError: false, errorColor: " #cc0000" });
 
       // https://github.com/Maorey/Blog/blob/ac5ced6deb3bbec689c672ec425640a0fba598f3/docs/.vitepress/config.js#L51

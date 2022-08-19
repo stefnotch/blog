@@ -5,3 +5,4 @@
 -->
 
 - [Sliding Puzzle](./SlidingPuzzle/index.md)
+- [Pagination](./Pagination/index.md)
