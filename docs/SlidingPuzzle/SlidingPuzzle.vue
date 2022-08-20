@@ -267,8 +267,12 @@ function handleInput(ev: KeyboardEvent) {
 </template>
 
 <style scoped>
-.game-table {
+table.game-table {
+  display: table;
   table-layout: fixed;
+  overflow: auto;
+  overflow-x: auto;
+  overflow-y: auto;
 }
 .game-table:focus > tbody {
   outline: 1px solid #000;
