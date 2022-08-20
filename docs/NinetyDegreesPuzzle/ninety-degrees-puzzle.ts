@@ -4,6 +4,7 @@ import {
   Cell,
   copyBoard,
 } from "../Puzzles/board";
+import { DisjointSet } from "./disjoint-set";
 
 export const Cells = {
   Empty: 0,
@@ -241,7 +242,7 @@ export function* getSolutions(startingBoard: Board) {
     return;
   }
 
-  console.log("start");
+  console.log("Getting solution...");
 
   while (true) {
     const board = queue.pop();
@@ -253,13 +254,57 @@ export function* getSolutions(startingBoard: Board) {
     for (const v of step.possibleCells) {
       const newBoard = copyBoard(board);
       newBoard.cells[step.y][step.x] = v;
-      if (isFull(newBoard)) {
-        yield newBoard;
+      const numberOfClosedLoops = countClosedLoops(newBoard);
+      if (numberOfClosedLoops >= 1) {
+        if (isFull(newBoard)) {
+          yield newBoard;
+        } else {
+          // Reject the board
+        }
       } else {
         queue.push(newBoard);
       }
     }
   }
+}
+
+/**
+ * Takes a valid board, and returns the number of actually closed loops.
+ */
+function countClosedLoops(board: Board) {
+  return 0;
+  /*type Discriminator = number;
+  type Coordinate = readonly [number, number, Discriminator];
+  const coordinates = board.cells.flatMap((row, y) =>
+    row.flatMap(
+      (cell, x) =>
+        (cell === Cells.All
+          ? ([
+              [x, y, 0],
+              [x, y, 1],
+            ] as const)
+          : ([[x, y, 0]] as const)) as readonly Coordinate[]
+    )
+  );
+  const loops = new DisjointSet<Coordinate>();
+  const disconnected: Coordinate = [-Infinity, -Infinity, 0];
+  loops.makeSet(disconnected);
+  coordinates.forEach((v) => loops.makeSet(v));
+
+  coordinates.forEach((v) => {
+    const [x, y] = v;
+    const cell = board.cells[y][x];
+
+    // Valid boards have the cute guarantee that adjacent cells are connected
+    // The Cells.All cell is a special case, because it's two overlapping loops
+    // We got the discriminator for that
+    if (cell === Cells.Empty || cell === Cells.Wall) {
+      loops.union(v, disconnected);
+    } else if (cell === Cells.All) {
+    }
+  });
+
+  return loops.size; // TODO: Implement*/
 }
 
 function isFull(board: Board): boolean {

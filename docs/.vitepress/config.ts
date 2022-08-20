@@ -1,6 +1,7 @@
 import mk from "@traptitech/markdown-it-katex";
+import { defineConfig } from "vitepress";
 
-export default {
+export default defineConfig({
   base: "/Blog/",
   head: [],
   title: "Stefnotch's Bloggy Blog",
@@ -34,4 +35,4 @@ export default {
       };
     },
   },
-};
+});

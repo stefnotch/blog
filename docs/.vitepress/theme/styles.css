@@ -2,3 +2,7 @@ strong,
 em {
   color: #1cb27e;
 }
+
+body {
+  overflow-y: scroll;
+}
