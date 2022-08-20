@@ -266,7 +266,7 @@ function handleInput(ev: KeyboardEvent) {
   <pre>{{ solution }}</pre>
 </template>
 
-<style>
+<style scoped>
 .game-table {
   table-layout: fixed;
 }
