@@ -31,7 +31,7 @@ TODO: Normalize it, divide by g, add u \* d
 
 ## Example code
 
-```cs
+```csharp
 // Constrains a vector to a cone around some other vector
 // coneDirection should be normalized
 public static Vector3 ConstrainToCone(ref Vector3 direction, ref Vector3 coneDirection, float maxAngle)

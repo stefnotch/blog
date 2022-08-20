@@ -125,6 +125,7 @@ function cycleCell(cell: Cell<typeof Cells>): Cell<typeof Cells> {
     </tbody>
   </table>
   <h2>Solutions</h2>
+  (Single loop rule not checked yet)
 
   <table
     v-for="(board, index) in solutions"

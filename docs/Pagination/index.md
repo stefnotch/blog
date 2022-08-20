@@ -1,6 +1,6 @@
 # Pagination
 
-No seriously, this is an entire page all about that little pagination bar at the bottom of some websites. This little thing
+No seriously, this is an entire page all about that little pagination bar at the bottom of some websites. This little thing is much trickier than I thought.
 
 TODO: Put pagination component here, 3 or so examples should do it
 
