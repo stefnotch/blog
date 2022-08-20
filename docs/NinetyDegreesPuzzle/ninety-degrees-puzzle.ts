@@ -92,22 +92,77 @@ function neighborsAt(
   board: Board,
   x: number,
   y: number
-): { [key in Direction]: Cell<typeof Cells> } {
-  return {
-    [Directions.Up]: getCellOrNull(board, x, y - 1) ?? Cells.Wall,
-    [Directions.Right]: getCellOrNull(board, x + 1, y) ?? Cells.Wall,
-    [Directions.Down]: getCellOrNull(board, x, y + 1) ?? Cells.Wall,
-    [Directions.Left]: getCellOrNull(board, x - 1, y) ?? Cells.Wall,
-  };
+): FullMap<Direction, Cell<typeof Cells>> {
+  return fullMap([
+    [Directions.Up, getCellOrNull(board, x, y - 1) ?? Cells.Wall],
+    [Directions.Right, getCellOrNull(board, x + 1, y) ?? Cells.Wall],
+    [Directions.Down, getCellOrNull(board, x, y + 1) ?? Cells.Wall],
+    [Directions.Left, getCellOrNull(board, x - 1, y) ?? Cells.Wall],
+  ]);
 }
 
-function mapValues<T extends Record<any, any>, U>(
-  obj: T,
-  fn: (v: keyof T) => U
-): { [key in keyof T]: U } {
-  return Object.fromEntries(
-    Object.entries(obj).map(([k, v]) => [k, fn(v)])
-  ) as any;
+type FullMap<K, V> = {
+  get(key: K): V;
+  set(key: K, value: V): void;
+  [Symbol.iterator](): IterableIterator<[K, V]>;
+};
+function fullMap<K, V>(entries: (readonly [K, V])[]): FullMap<K, V> {
+  return new Map<K, V>(entries) as FullMap<K, V>;
+}
+
+const CellPatterns = {
+  MustHave: 0,
+  MustNotHave: 1,
+  Optional: 2,
+};
+type CellPattern = typeof CellPatterns[keyof typeof CellPatterns];
+
+function matchesPattern(
+  cell: Cell<typeof Cells>,
+  pattern: FullMap<Direction, CellPattern>
+) {
+  const cellDirections = cellToDirection(cell);
+  const allDirections = [
+    Directions.Up,
+    Directions.Right,
+    Directions.Down,
+    Directions.Left,
+  ];
+  return allDirections.every((direction) => {
+    if (pattern.get(direction) === CellPatterns.Optional) {
+      return true;
+    } else {
+      const hasDirection = cellDirections.includes(direction);
+      return (
+        (pattern.get(direction) === CellPatterns.MustHave) === hasDirection
+      );
+    }
+  });
+}
+
+function mapValues<K, V, U>(
+  map: FullMap<K, V>,
+  fn: (key: K, value: V) => U
+): FullMap<K, U> {
+  const result = new Map<K, U>();
+  for (const [key, value] of map) {
+    result.set(key, fn(key, value));
+  }
+  return result as FullMap<K, U>;
+}
+
+function getValidPattern(
+  board: Board,
+  x: number,
+  y: number
+): FullMap<Direction, CellPattern> {
+  return mapValues(neighborsAt(board, x, y), (direction, neighbor) =>
+    neighbor === Cells.Empty
+      ? CellPatterns.Optional
+      : cellToDirection(neighbor).includes(oppositeDirection(direction))
+      ? CellPatterns.MustHave
+      : CellPatterns.MustNotHave
+  );
 }
 
 function validCellsAt(
@@ -117,10 +172,7 @@ function validCellsAt(
 ): Cell<typeof Cells>[] {
   const cell = board.cells[y][x];
   if (cell === Cells.Empty) {
-    const neighbors = mapValues(neighborsAt(board, x, y), (v) =>
-      // Pretend that empty cells allow all directions (for the purposes of being a neighbor)
-      cellToDirection(v === Cells.Empty ? Cells.All : v)
-    );
+    const allowedCellPattern = getValidPattern(board, x, y);
     const possibleCells = [
       Cells.TopLeft,
       Cells.LeftBottom,
@@ -130,12 +182,7 @@ function validCellsAt(
       Cells.LeftRight,
       Cells.All,
     ];
-    return possibleCells.filter((v) => {
-      const cellDirections = cellToDirection(v);
-      return cellDirections.every((direction) =>
-        neighbors[direction].includes(oppositeDirection(direction))
-      );
-    });
+    return possibleCells.filter((v) => matchesPattern(v, allowedCellPattern));
   } else {
     return [];
   }
@@ -184,6 +231,9 @@ function nextBestStep(board: Board): {
  * Takes a valid board, and returns valid board solutions
  */
 export function* getSolutions(startingBoard: Board) {
+  if (!isValid(startingBoard)) {
+    return;
+  }
   const queue = [startingBoard];
 
   if (isFull(startingBoard)) {
@@ -214,4 +264,20 @@ export function* getSolutions(startingBoard: Board) {
 
 function isFull(board: Board): boolean {
   return board.cells.every((row) => row.every((cell) => cell !== Cells.Empty));
+}
+
+function isValid(board: Board) {
+  for (let y = 0; y < board.height; y++) {
+    for (let x = 0; x < board.width; x++) {
+      if (board.cells[y][x] === Cells.Empty) {
+        continue;
+      }
+      const validPattern = getValidPattern(board, x, y);
+      if (!matchesPattern(board.cells[y][x], validPattern)) {
+        return false;
+      }
+    }
+  }
+
+  return true;
 }
