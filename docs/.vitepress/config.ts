@@ -2,7 +2,7 @@ import mk from "@traptitech/markdown-it-katex";
 import { defineConfig } from "vitepress";
 
 export default defineConfig({
-  base: "/Blog/",
+  base: "/blog/",
   head: [],
   title: "Stefnotch's Bloggy Blog",
   themeConfig: {
