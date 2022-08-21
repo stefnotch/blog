@@ -346,45 +346,6 @@ function countClosedLoops(board: Board) {
   );
 
   return numberOfClosedLoops;
-  /*
-  type Discriminator = 0 | 1;
-  type Coordinate = readonly [number, number, Discriminator];
-  const coordinates = board.cells.map((row, y) =>
-    row.map(
-      (cell, x) =>
-        (cell === Cells.All
-          ? ([
-              [x, y, 0],
-              [x, y, 1],
-            ] as const)
-          : ([[x, y, 0]] as const)) as readonly Coordinate[]
-    )
-  );
-  const loops = new DisjointSet<Coordinate>();
-  const disconnected: Coordinate = [-Infinity, -Infinity, 0];
-  loops.makeSet(disconnected);
-  coordinates.forEach((row) =>
-    row.forEach((c) => c.forEach((v) => loops.makeSet(v)))
-  );
-
-  coordinates.forEach((row) =>
-    row.forEach((c) =>
-      c.forEach((v) => {
-        const [x, y] = v;
-        const cell = board.cells[y][x];
-
-        // Valid boards have the cute guarantee that adjacent cells are connected
-        // The Cells.All cell is a special case, because it's two overlapping loops
-        // We got the discriminator for that
-        if (cell === Cells.Empty || cell === Cells.Wall) {
-          loops.union(v, disconnected);
-        } else if (cell === Cells.All) {
-        }
-      })
-    )
-  );
-
-  return loops.size; // TODO: Implement*/
 }
 
 /**
