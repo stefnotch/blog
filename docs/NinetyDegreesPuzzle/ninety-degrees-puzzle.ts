@@ -12,7 +12,6 @@ import {
   hasDirection,
   removeDirection,
 } from "../Puzzles/directions";
-import { DisjointSet } from "./disjoint-set";
 
 export const Cells = {
   Empty: 0,
@@ -232,19 +231,27 @@ function nextBestStep(board: Board): {
   // Pick a nice tile, generate all possibilities and either return them or put them in the queue
   for (let y = 0; y < board.height; y++) {
     for (let x = 0; x < board.width; x++) {
-      const possibleCells = validCellsAt(board, x, y);
-      if (possibleCells.length == 0) continue;
-      if (possibleCells.length == 1) {
-        return {
-          x,
-          y,
-          possibleCells,
-        };
-      } else if (possibleCells.length < nextCells.score) {
-        nextCells.score = possibleCells.length;
-        nextCells.x = x;
-        nextCells.y = y;
-        nextCells.possibleCells = possibleCells;
+      if (board.cells[y][x] === Cells.Empty) {
+        const possibleCells = validCellsAt(board, x, y);
+        if (possibleCells.length == 0) {
+          return {
+            x,
+            y,
+            possibleCells: [],
+          };
+        }
+        if (possibleCells.length == 1) {
+          return {
+            x,
+            y,
+            possibleCells,
+          };
+        } else if (possibleCells.length < nextCells.score) {
+          nextCells.score = possibleCells.length;
+          nextCells.x = x;
+          nextCells.y = y;
+          nextCells.possibleCells = possibleCells;
+        }
       }
     }
   }
@@ -265,20 +272,22 @@ export function* getSolutions(startingBoard: Board) {
     return;
   }
 
-  console.log("Getting solution...");
-
   while (true) {
     const board = queue.pop();
     if (board === undefined) {
       return;
     }
     const step = nextBestStep(board);
+    if (step.possibleCells.length === 0) {
+      // Reject the board
+      continue;
+    }
 
     for (const v of step.possibleCells) {
       const newBoard = copyBoard(board);
       newBoard.cells[step.y][step.x] = v;
       const numberOfClosedLoops = countClosedLoops(newBoard);
-      if (numberOfClosedLoops >= 1 /* TODO: Temp hack */ || isFull(newBoard)) {
+      if (numberOfClosedLoops >= 1) {
         if (isFull(newBoard)) {
           yield newBoard;
         } else {
@@ -434,7 +443,10 @@ function travelAlongLoop(
     if (hasDirection(neighbor, oppositeDirection(baseDirection))) {
       // Found a valid neighbor, keep traveling
       const neighborCell = board.cells[neighborY][neighborX];
-      const exitDirection = getExitDirection(neighborCell, baseDirection);
+      const exitDirection = getExitDirection(
+        neighborCell,
+        oppositeDirection(baseDirection)
+      );
       if (exitDirection === null) {
         throw new Error(
           "Invalid exit direction, this shouldn't happen if the board is valid " +
@@ -443,7 +455,12 @@ function travelAlongLoop(
             baseDirection
         );
       }
-      queue.push([neighborX, neighborY, baseDirection, exitDirection]);
+      queue.push([
+        neighborX,
+        neighborY,
+        oppositeDirection(baseDirection),
+        exitDirection,
+      ]);
     } else {
       // Found a dead end
       return false;
