@@ -278,10 +278,12 @@ table.game-table {
   outline: 1px solid #000;
 }
 .game-table::after {
+  position: absolute;
   content: "<Paused - click to play>";
 }
 
 .game-table:focus::after {
+  position: absolute;
   content: "Playing";
 }
 </style>
