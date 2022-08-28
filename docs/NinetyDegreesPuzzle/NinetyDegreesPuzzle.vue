@@ -202,6 +202,14 @@ function getDirectionAndCell(ev: PointerEvent) {
 
 function onPointerDown(ev: PointerEvent) {
   (ev.currentTarget as HTMLElement).setPointerCapture(ev.pointerId);
+
+  if (ev.buttons === 2) {
+    const v = getDirectionAndCell(ev);
+    if (!v) return;
+    const { coords } = v;
+    board.value.cells[coords.y][coords.x] = Cells.Empty;
+  }
+
   // The primary button needs to be pressed
   if (ev.buttons !== 1) return;
 
@@ -270,6 +278,7 @@ function onPointerUp(ev: PointerEvent) {
     @pointerdown="onPointerDown"
     @pointermove="onPointerMove"
     @pointerup="onPointerUp"
+    @contextmenu.prevent
   >
     <tbody>
       <tr v-for="(row, y) in board.cells">
