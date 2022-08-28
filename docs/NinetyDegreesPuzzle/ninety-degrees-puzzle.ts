@@ -539,3 +539,45 @@ function getExitDirection(
       throw new Error("Invalid cell");
   }
 }
+
+/**
+ * Get closer to one of the solutions of the board
+ */
+export function narrowBoard(board: Board): Board {
+  const possibleCells: { x: number; y: number; cell: Cell<typeof Cells> }[] =
+    [];
+
+  // Generate all possibilities
+  for (let y = 0; y < board.height; y++) {
+    for (let x = 0; x < board.width; x++) {
+      if (board.cells[y][x] === Cells.Empty) {
+        validCellsAt(board, x, y)
+          .map((v) => ({ x, y, cell: v }))
+          .forEach((v) => possibleCells.push(v));
+      }
+    }
+  }
+
+  while (true) {
+    // TODO: Maybe sleep?
+    const randomCellIndex = Math.floor(Math.random() * possibleCells.length);
+    const randomCell = possibleCells[randomCellIndex];
+    const newBoard = copyBoard(board);
+    newBoard.cells[randomCell.y][randomCell.x] = randomCell.cell;
+
+    let count = 0;
+    for (const solution of getSolutions(newBoard)) {
+      count += 1;
+      if (count >= 2) break;
+    }
+
+    if (count === 0) {
+      // Just try again
+      possibleCells.splice(randomCellIndex, 1);
+    } else if (count == 1) {
+      return newBoard;
+    } else {
+      return newBoard;
+    }
+  }
+}

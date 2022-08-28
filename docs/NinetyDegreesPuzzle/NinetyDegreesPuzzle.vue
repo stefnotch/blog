@@ -5,6 +5,7 @@ import {
   getSolutions,
   Cells,
   getCellFromDirections,
+  narrowBoard,
 } from "./ninety-degrees-puzzle";
 import { ref, unref, watch } from "vue";
 import { Cell } from "../Puzzles/board";
@@ -252,6 +253,10 @@ function onPointerUp(ev: PointerEvent) {
   currentDrawing.value = null;
   (ev.currentTarget as HTMLElement).releasePointerCapture(ev.pointerId);
 }
+
+function narrowSolution() {
+  board.value = narrowBoard(board.value);
+}
 </script>
 <template>
   <div>
@@ -303,24 +308,32 @@ function onPointerUp(ev: PointerEvent) {
     <button @click="shareBoard">Copy</button>
   </div>
   <h2>Solutions</h2>
+  <div class="solutions-container">
+    <div>
+      <button @click="narrowSolution">Add random tile from solution</button>
+    </div>
 
-  <table
-    v-for="(board, index) in solutions"
-    :key="index"
-    :tabIndex="0"
-    className="game-table"
-  >
-    <tbody>
-      <tr v-for="(row, y) in board.cells">
-        <td v-for="(cell, x) in row">
-          <div class="game-table-cell" :class="displayCellClass(cell)"></div>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+    <table
+      v-for="(board, index) in solutions"
+      :key="index"
+      :tabIndex="0"
+      className="game-table"
+    >
+      <tbody>
+        <tr v-for="(row, y) in board.cells">
+          <td v-for="(cell, x) in row">
+            <div class="game-table-cell" :class="displayCellClass(cell)"></div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </template>
 
 <style scoped>
+.solutions-container {
+  min-height: 100vh;
+}
 table.game-table {
   display: table;
   table-layout: fixed;
