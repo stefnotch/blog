@@ -17,6 +17,10 @@ const boardSize = ref({
 });
 const board = ref(createBoardWithSize(boardSize.value));
 
+const showSolutions = ref(
+  new URL(window.location.href).searchParams.get("showSolutions") !== "false"
+);
+
 watch(
   boardSize,
   (newSize) => {
@@ -134,6 +138,7 @@ const currentDrawing = ref<{
   x: number;
   y: number;
   direction: BaseDirection;
+  originalCell: Cell<typeof Cells>;
 } | null>(null);
 
 function displayDrawingClass(direction: BaseDirection) {
@@ -222,6 +227,7 @@ function onPointerDown(ev: PointerEvent) {
     x: coords.x,
     y: coords.y,
     direction,
+    originalCell: board.value.cells[coords.y][coords.x],
   };
 }
 function onPointerMove(ev: PointerEvent) {
@@ -241,12 +247,19 @@ function onPointerMove(ev: PointerEvent) {
       x: coords.x,
       y: coords.y,
       direction,
+      originalCell: board.value.cells[coords.y][coords.x],
     };
   } else {
-    board.value.cells[coords.y][coords.x] = getCellFromDirections(
-      current.direction,
-      direction
-    );
+    let newCell = getCellFromDirections(current.direction, direction);
+    if (current.originalCell == Cells.TopBottom && newCell == Cells.LeftRight) {
+      newCell = Cells.All;
+    } else if (
+      current.originalCell == Cells.LeftRight &&
+      newCell == Cells.TopBottom
+    ) {
+      newCell = Cells.All;
+    }
+    board.value.cells[coords.y][coords.x] = newCell;
   }
 }
 function onPointerUp(ev: PointerEvent) {
@@ -307,8 +320,8 @@ function narrowSolution() {
   <div>
     <button @click="shareBoard">Copy</button>
   </div>
-  <h2>Solutions</h2>
-  <div class="solutions-container">
+  <h2>Solutions <input type="checkbox" v-model="showSolutions" /></h2>
+  <div class="solutions-container" v-if="showSolutions">
     <div>
       <button @click="narrowSolution">Add random tile from solution</button>
     </div>

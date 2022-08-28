@@ -2,9 +2,9 @@
   "dependencies": {
     "@traptitech/markdown-it-katex": "^3.6.0",
     "gh-pages": "^4.0.0",
-    "katex": "^0.16.0",
+    "katex": "^0.16.1",
     "markdown-it": "^13.0.1",
-    "pixi.js": "^6.5.1"
+    "pixi.js": "^6.5.2"
   },
   "scripts": {
     "dev": "vitepress dev docs",
@@ -13,7 +13,7 @@
     "deploy": "vitepress build docs && node utils/publish.js"
   },
   "devDependencies": {
-    "vitepress": "^1.0.0-alpha.9",
+    "vitepress": "^1.0.0-alpha.12",
     "vue": "^3.2.37"
   }
 }
