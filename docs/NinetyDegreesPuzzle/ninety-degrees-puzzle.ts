@@ -11,6 +11,7 @@ import {
   fromDirections,
   hasDirection,
   removeDirection,
+  removeDirections,
 } from "../Puzzles/directions";
 
 export const Cells = {
@@ -85,6 +86,33 @@ function cellToDirection(cell: Cell<typeof Cells>): BaseDirection[] {
   }
 }
 
+export function getCellFromDirections(
+  fromDirection: BaseDirection,
+  toDirection: BaseDirection
+): Cell<typeof Cells> {
+  if (fromDirection === toDirection) {
+    return Cells.Empty;
+  } else {
+    const possibleCells = [
+      Cells.TopLeft,
+      Cells.LeftBottom,
+      Cells.BottomRight,
+      Cells.RightTop,
+      Cells.TopBottom,
+      Cells.LeftRight,
+    ];
+    return (
+      possibleCells.find((cell) => {
+        const cellDirections = cellToDirection(cell);
+        return (
+          cellDirections.includes(fromDirection) &&
+          cellDirections.includes(toDirection)
+        );
+      }) ?? Cells.Empty
+    );
+  }
+}
+
 function cellToBitCell(cell: Cell<typeof Cells>): BitCell {
   return BitCells[cell];
 }
@@ -139,6 +167,17 @@ const CellPatterns = {
   Optional: 2,
 };
 type CellPattern = typeof CellPatterns[keyof typeof CellPatterns];
+
+function matchesBitPattern(
+  cell: BitCell,
+  optionalPattern: Direction,
+  pattern: Direction
+) {
+  return (
+    removeDirections(cell, optionalPattern) ==
+    removeDirections(pattern, optionalPattern)
+  );
+}
 
 function matchesPattern(
   cell: Cell<typeof Cells>,

@@ -40,7 +40,14 @@ export function hasDirection(
 
 export function removeDirection(
   direction: Direction,
-  baseDirection: BaseDirection
+  toRemove: BaseDirection
 ): Direction {
-  return brandDirection(direction & ~baseDirection);
+  return brandDirection(direction & ~toRemove);
+}
+
+export function removeDirections(
+  direction: Direction,
+  toRemove: Direction
+): Direction {
+  return brandDirection(direction & ~toRemove);
 }

@@ -4,9 +4,11 @@ import {
   Board,
   getSolutions,
   Cells,
+  getCellFromDirections,
 } from "./ninety-degrees-puzzle";
 import { ref, unref, watch } from "vue";
 import { Cell } from "../Puzzles/board";
+import { BaseDirection, Directions } from "../Puzzles/directions";
 
 const boardSize = ref({
   width: 10,
@@ -19,8 +21,25 @@ watch(
   (newSize) => {
     board.value = createBoardWithSize(newSize);
   },
-  { deep: true }
+  { deep: true, flush: "sync" }
 );
+
+(() => {
+  const url = new URL(window.location.href);
+  const boardString = url.searchParams.get("board");
+  if (boardString) {
+    try {
+      const parsedBoard = JSON.parse(boardString);
+      boardSize.value = {
+        width: parsedBoard.width,
+        height: parsedBoard.height,
+      };
+      board.value = parsedBoard;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+})();
 
 const solutions = ref<Board[]>([]);
 watch(
@@ -95,6 +114,136 @@ function cycleCell(cell: Cell<typeof Cells>): Cell<typeof Cells> {
   }
   return cell;
 }
+
+function shareBoard() {
+  const url = new URL(window.location.href);
+  // Maybe npm install jsoncrush
+  url.searchParams.set("board", JSON.stringify(board.value));
+  navigator.clipboard.writeText(url + "").then(
+    () => {
+      console.log("copied");
+    },
+    () => {
+      console.log("copying failed");
+    }
+  );
+}
+
+const currentDrawing = ref<{
+  x: number;
+  y: number;
+  direction: BaseDirection;
+} | null>(null);
+
+function displayDrawingClass(direction: BaseDirection) {
+  if (direction === Directions.Up) {
+    return "drawing-up";
+  } else if (direction === Directions.Down) {
+    return "drawing-down";
+  } else if (direction === Directions.Left) {
+    return "drawing-left";
+  } else if (direction === Directions.Right) {
+    return "drawing-right";
+  }
+}
+
+function normalizedCoords(ev: PointerEvent, target: Element) {
+  const bounds = target.getBoundingClientRect();
+  const x = (ev.clientX - bounds.left) / bounds.width;
+  const y = (ev.clientY - bounds.top) / bounds.height;
+  return { x, y };
+}
+
+function getDirection(coords: { x: number; y: number }) {
+  // (pointer.x - center.x) - (point.y - center.y) > 0
+  const diagonalA = coords.x - 0.5 - (coords.y - 0.5) > 0;
+  // (pointer.x - center.x) + (point.y - center.y) > 0
+  const diagonalB = coords.x - 0.5 + (coords.y - 0.5) > 0;
+  if (diagonalA && !diagonalB) {
+    return Directions.Up;
+  } else if (diagonalA && diagonalB) {
+    return Directions.Right;
+  } else if (!diagonalA && diagonalB) {
+    return Directions.Down;
+  } else {
+    return Directions.Left;
+  }
+}
+
+function getParentWithClass(element: Element | null, className: string) {
+  let current = element;
+  while (current) {
+    if (current.classList.contains(className)) {
+      return current;
+    }
+    current = current.parentElement;
+  }
+  return null;
+}
+
+function getDirectionAndCell(ev: PointerEvent) {
+  const target = getParentWithClass(
+    document.elementFromPoint(ev.clientX, ev.clientY),
+    "cell"
+  );
+  if (!target) return;
+  const coords = normalizedCoords(ev, target);
+  const direction = getDirection(coords);
+  const cellCoords = {
+    x: +(target.getAttribute("data-cell-x") ?? 0),
+    y: +(target.getAttribute("data-cell-y") ?? 0),
+  };
+
+  return {
+    direction,
+    coords: cellCoords,
+  };
+}
+
+function onPointerDown(ev: PointerEvent) {
+  (ev.currentTarget as HTMLElement).setPointerCapture(ev.pointerId);
+  // The primary button needs to be pressed
+  if (ev.buttons !== 1) return;
+
+  const v = getDirectionAndCell(ev);
+  if (!v) return;
+  const { direction, coords } = v;
+
+  currentDrawing.value = {
+    x: coords.x,
+    y: coords.y,
+    direction,
+  };
+}
+function onPointerMove(ev: PointerEvent) {
+  // The primary button needs to be pressed
+  if (ev.buttons !== 1) return;
+
+  const current = currentDrawing.value;
+  if (!current) return;
+
+  const v = getDirectionAndCell(ev);
+  if (!v) return;
+  const { direction, coords } = v;
+
+  const isNewCell = coords.x !== current.x || coords.y !== current.y;
+  if (isNewCell) {
+    currentDrawing.value = {
+      x: coords.x,
+      y: coords.y,
+      direction,
+    };
+  } else {
+    board.value.cells[coords.y][coords.x] = getCellFromDirections(
+      current.direction,
+      direction
+    );
+  }
+}
+function onPointerUp(ev: PointerEvent) {
+  currentDrawing.value = null;
+  (ev.currentTarget as HTMLElement).releasePointerCapture(ev.pointerId);
+}
 </script>
 <template>
   <div>
@@ -115,15 +264,35 @@ function cycleCell(cell: Cell<typeof Cells>): Cell<typeof Cells> {
       v-model="boardSize.height"
     />
   </div>
-  <table :tabIndex="0" className="game-table">
+  <table
+    :tabIndex="0"
+    className="game-table"
+    @pointerdown="onPointerDown"
+    @pointermove="onPointerMove"
+    @pointerup="onPointerUp"
+  >
     <tbody>
       <tr v-for="(row, y) in board.cells">
-        <td v-for="(cell, x) in row" @click="(ev) => handleClick(ev, x, y)">
+        <!--@click="(ev) => handleClick(ev, x, y)"-->
+        <td
+          v-for="(cell, x) in row"
+          class="cell"
+          :data-cell-x="x"
+          :data-cell-y="y"
+        >
           <div class="game-table-cell" :class="displayCellClass(cell)"></div>
+          <div
+            class="game-table-cell-drawing"
+            v-if="currentDrawing?.x === x && currentDrawing?.y === y"
+            :class="displayDrawingClass(currentDrawing.direction)"
+          ></div>
         </td>
       </tr>
     </tbody>
   </table>
+  <div>
+    <button @click="shareBoard">Copy</button>
+  </div>
   <h2>Solutions</h2>
 
   <table
@@ -153,6 +322,9 @@ table.game-table {
 .game-table:focus > tbody {
   outline: 1px solid #000;
 }
+.cell > * {
+  pointer-events: none;
+}
 .game-table tr {
   padding: 0px;
   margin: 0px;
@@ -176,6 +348,27 @@ table.game-table {
   border: var(--line-thickness) solid #000;
   box-sizing: border-box;
   overflow: hidden;
+}
+.game-table-cell-drawing {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+.drawing-up {
+  box-shadow: inset 0 2px 2px #00000088;
+}
+.drawing-down {
+  box-shadow: inset 0 -2px 2px #00000088;
+}
+.drawing-left {
+  box-shadow: inset 2px 0 2px #00000088;
+}
+.drawing-right {
+  box-shadow: inset -2px 0 2px #00000088;
 }
 
 /* Straight paths */
