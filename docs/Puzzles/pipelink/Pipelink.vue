@@ -8,8 +8,8 @@ import {
   narrowBoard,
 } from "./ninety-degrees-puzzle";
 import { ref, unref, watch } from "vue";
-import { Cell } from "../Puzzles/board";
-import { BaseDirection, Directions } from "../Puzzles/directions";
+import { Cell } from "../board";
+import { BaseDirection, Directions } from "../directions";
 
 const boardSize = ref({
   width: 10,

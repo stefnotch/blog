@@ -14,5 +14,5 @@ Click on the board to start playing.
 </ClientOnly>
 
 <script setup>
-import SlidingPuzzle from './SlidingPuzzle.vue'
+import SlidingPuzzle from './SlidingPuzzle/SlidingPuzzle.vue'
 </script>

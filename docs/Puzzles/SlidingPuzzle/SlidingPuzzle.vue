@@ -2,7 +2,7 @@
 import { ref, computed, watch, type Ref, type ComputedRef } from "vue";
 import { Position } from "./position";
 import { Cells, createBoardWithSize, Board } from "./sliding-puzzle-board";
-import { Cell, copyBoard, copyBoardTo, createBoard } from "../Puzzles/board";
+import { Cell, copyBoard, copyBoardTo, createBoard } from "../board";
 import { usePlayer } from "./sliding-puzzle-player";
 
 const boardSize = ref({

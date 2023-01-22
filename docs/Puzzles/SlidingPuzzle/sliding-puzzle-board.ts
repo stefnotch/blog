@@ -1,4 +1,4 @@
-import { createBoard, Board as GenericBoard } from "../Puzzles/board";
+import { createBoard, Board as GenericBoard } from "../board";
 
 export const Cells = {
   Empty: 0,

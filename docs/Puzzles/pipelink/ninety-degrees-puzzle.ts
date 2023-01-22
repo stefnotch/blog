@@ -1,9 +1,4 @@
-import {
-  createBoard,
-  Board as GenericBoard,
-  Cell,
-  copyBoard,
-} from "../Puzzles/board";
+import { createBoard, Board as GenericBoard, Cell, copyBoard } from "../board";
 import {
   BaseDirection,
   Direction,
@@ -12,7 +7,7 @@ import {
   hasDirection,
   removeDirection,
   removeDirections,
-} from "../Puzzles/directions";
+} from "../directions";
 
 export const Cells = {
   Empty: 0,

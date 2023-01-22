@@ -1,9 +1,3 @@
-# Pages
+# Stefnotch's Blog
 
-<!--
-- [Constrain To Cone](./ConstrainToCone/index.md)
--->
-
-- [Sliding Puzzle](./SlidingPuzzle/index.md)
-- [Ninety Degrees Puzzle](./NinetyDegreesPuzzle/index.md)
-- [Pagination](./Pagination/index.md)
+Welcome to my little blog
