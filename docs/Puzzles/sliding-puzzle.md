@@ -1,4 +1,5 @@
-A cute little sliding puzzle game.
+# A cute little sliding puzzle game
+
 Given a board with a $n$ x $m$ size, we solve it by starting at the player :cat2:. Then there are 4 possible directions (up, down, left, right). We try walking in those directions until we hit a rock. This gives us our potentially new solutions. So we add those to a queue and mark the field of the player as completed.
 
 Then, unsurprisingly, we take a position out of the queue. We do this whole 'walk in 4 directions, check if visited and add to queue' again. And repeat.
