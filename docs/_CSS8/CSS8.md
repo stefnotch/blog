@@ -43,3 +43,40 @@ rule(1) :- nodeType(X, 1), nodeType(Y, 2), nodeAncestor(Y, X).
 :- N = #count { R : rule(R) }, N < RC, ruleCount(RC).
 
 ```
+
+
+Generate the minimal amount of HTML code required to showcase some CSS selectors.
+Like if you have this
+```css
+html > body {
+ /* imagine there were CSS rules here */
+}
+html div {
+ /* imagine there were CSS rules here */
+}
+div.cat {
+ /* imagine there were CSS rules here */
+}
+#neko {
+ /* imagine there were CSS rules here */
+}
+```
+
+Then one minimal HTML code would be 
+```html
+<html>
+  <body>
+    <div class="cat" id="neko">
+    </div>
+  </body>
+</html>
+```
+Another one would be
+```html
+<html id="neko">
+  <body>
+  </body>
+  <div class="cat">
+  </div>
+</html>
+```
