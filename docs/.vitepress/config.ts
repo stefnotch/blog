@@ -5,7 +5,6 @@ import { defineConfig } from "vitepress";
 const sidebar = generateSidebar({
   root: "/docs",
   hyphenToSpace: true,
-  collapsible: true,
   collapsed: false,
   capitalizeFirst: true,
 })[0].items.filter((v) => !(v.text + "").startsWith("_"));
